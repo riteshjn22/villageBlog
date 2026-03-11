@@ -1,5 +1,34 @@
 @import "tailwindcss";
 
+#single p {
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+#single figure {
+  text-align: center;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+#single hr {
+  margin: 10px 0;
+}
+#single table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  text-align: left;
+}
+#single table td,
+#single table th {
+  word-break: break-word;
+  border-color: #dcdcdc;
+  border: 1px solid;
+  padding: 0.5em;
+}
+
 /* :root {
   --background: #ffffff;
   --foreground: #171717;
