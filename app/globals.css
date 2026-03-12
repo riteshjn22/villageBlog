@@ -2,7 +2,10 @@
 
 #single p {
   line-height: 1.5;
-  margin-bottom: 20px;
+  margin: 20px 0;
+}
+#authorSec {
+  margin: inherit !important;
 }
 #single figure {
   text-align: center;
@@ -10,6 +13,7 @@
   width: 100%;
   align-items: center;
   justify-content: center;
+  margin: 20px 0;
 }
 #single hr {
   margin: 10px 0;
@@ -27,6 +31,13 @@
   border-color: #dcdcdc;
   border: 1px solid;
   padding: 0.5em;
+}
+#single ul,
+#single ol {
+  font-size: 1em;
+  padding: 0;
+  margin: 1.5em;
+  list-style: disc;
 }
 
 /* :root {

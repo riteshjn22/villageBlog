@@ -221,3 +221,12 @@ export async function saveContent(page_id, data = {}, params = {}) {
     return { error: "Unexpected error while saving content" };
   }
 }
+
+// Formate Date
+export function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}

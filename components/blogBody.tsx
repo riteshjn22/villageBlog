@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/common";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -33,13 +34,19 @@ export default function BlogBody({ item }: { item: BlogItem }) {
       >
         <div>
           <p className="w-full truncate text-sm font-medium">{item?.title}</p>
-          <p className="flex w-full gap-4 truncate text-xs font-medium text-blue-700">
-            {item?.author && <span>{`Author : ${item?.author}`}</span>}
-            {item?.date && <span>{`Published : ${item?.date}`}</span>}
+          <p className="flex w-full gap-4 truncate text-xs font-medium text-gray-400">
+            {item?.author && (
+              <span className="capitalize">{`Author : ${item?.author}`}</span>
+            )}
+            {item?.date && (
+              <span>{`Published : ${formatDate(item?.date)}`}</span>
+            )}
           </p>
         </div>
 
-        <p className="line-clamp-2 text-sm">{item?.short_description}</p>
+        <p className="line-clamp-2 text-sm">
+          {item?.short_description?.replace(/<[^>]*>/g, "")}
+        </p>
       </div>
     </Link>
   );
