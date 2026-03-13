@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }) {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-gray-500">Checking session...</p>
       </div>
     );
@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <main className="flex w-full md:max-w-275 mx-auto p-4 flex-wrap gap-4 md:flex-nowrap">
+    <main className="mx-auto flex w-full flex-wrap gap-4 p-4 md:max-w-275 md:flex-nowrap">
       <LeftSideBar />
       {children}
     </main>

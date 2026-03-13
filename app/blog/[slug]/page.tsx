@@ -1,9 +1,11 @@
+import WPWidgetArea from "@/components/WPWidgetArea";
 import { HOST, SITE_NAME } from "@/lib/constants/constants";
 import {
   getAllPosts,
   getAllPages,
   getPostBySlug,
   getPageBySlug,
+  // getRightSidebarWidgets,
 } from "@/lib/wordpress";
 import { formatDate } from "@/utils/common";
 import Image from "next/image";
@@ -84,6 +86,8 @@ export default async function SingleBlog({
   const page = post ? null : await getPageBySlug(slug);
   const content = post || page;
 
+  // const rightWidgets = await getRightSidebarWidgets();
+
   if (!content) notFound();
 
   const author = content?._embedded?.author?.[0]?.name;
@@ -120,7 +124,9 @@ export default async function SingleBlog({
         </div>
         <div dangerouslySetInnerHTML={{ __html: content.content.rendered }} />
       </div>
-      <div className="sticky top-18 flex w-full self-start md:w-1/3">test</div>
+      <div className="sticky top-18 flex w-full self-start md:w-1/3">
+        {/* <WPWidgetArea sidebar="right" widgets={rightWidgets} /> */}
+      </div>
     </article>
   );
 }
