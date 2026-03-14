@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+#right_sidebar .widget {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 16px;
+}
+#footer_sidebar .widget {
+  border-right: 1px solid #ccc;
+}
+#footer_sidebar .widget:last-child,
+#right_sidebar .widget:last-child {
+  border: none;
+}
+
 #single p {
   line-height: 1.5;
   margin: 20px 0;

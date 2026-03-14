@@ -5,7 +5,7 @@ import {
   getAllPages,
   getPostBySlug,
   getPageBySlug,
-  // getRightSidebarWidgets,
+  getRightSidebarWidgets,
 } from "@/lib/wordpress";
 import { formatDate } from "@/utils/common";
 import Image from "next/image";
@@ -86,7 +86,7 @@ export default async function SingleBlog({
   const page = post ? null : await getPageBySlug(slug);
   const content = post || page;
 
-  // const rightWidgets = await getRightSidebarWidgets();
+  const rightWidgets = await getRightSidebarWidgets();
 
   if (!content) notFound();
 
@@ -125,7 +125,7 @@ export default async function SingleBlog({
         <div dangerouslySetInnerHTML={{ __html: content.content.rendered }} />
       </div>
       <div className="sticky top-18 flex w-full self-start md:w-1/3">
-        {/* <WPWidgetArea sidebar="right" widgets={rightWidgets} /> */}
+        <WPWidgetArea sidebar="right" widgets={rightWidgets} />
       </div>
     </article>
   );

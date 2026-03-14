@@ -3,8 +3,8 @@ import { HOST } from "@/lib/constants/constants";
 
 // ─── URL transformer ────────────────────────────────────────────────────────
 
-function toLocalUrl(url: string): string {
-  if (!url) return url;
+function toLocalUrl(url: string | undefined): string {
+  if (!url) return "";
   try {
     const parsed = new URL(url);
     const wpOrigin = process.env.NEXT_PUBLIC_WP_URL
@@ -36,6 +36,28 @@ interface WidgetItem {
   post_title?: string;
 }
 
+interface WidgetRaw {
+  title?: string;
+  text?: string;
+  filter?: boolean;
+  visual?: boolean;
+  content?: string;
+  sortby?: string;
+  exclude?: string;
+  // media_image specific
+  url?: string;
+  attachment_id?: number;
+  width?: number;
+  height?: number;
+  caption?: string;
+  alt?: string;
+  link_type?: string;
+  link_url?: string;
+  link_target_blank?: boolean;
+  size?: string;
+  [key: string]: unknown;
+}
+
 interface Widget {
   id: string;
   type: string;
@@ -46,9 +68,10 @@ interface Widget {
   link_url?: string;
   rss_url?: string;
   note?: string;
+  filter?: boolean;
+  raw?: WidgetRaw;
   items?: WidgetItem[];
 }
-
 interface WPWidgetAreaProps {
   sidebar: "footer" | "right" | "left";
   widgets: Widget[];
@@ -183,16 +206,18 @@ function RssFeed({ widget }: { widget: Widget }) {
 }
 
 function ImageWidget({ widget }: { widget: Widget }) {
-  if (!widget.image_url) return null;
+  if (!widget?.raw?.url) return null;
   const img = (
     <img
-      src={widget.image_url}
-      alt={widget.alt ?? ""}
+      src={widget?.raw?.url}
+      alt={widget?.raw?.alt ?? ""}
       className="w-full rounded"
     />
   );
-  return widget.link_url ? (
-    <Link href={toLocalUrl(widget.link_url)}>{img}</Link>
+  return widget?.raw?.link_url ? (
+    <Link href={toLocalUrl(widget?.raw?.link_url)} target="_blank">
+      {img}
+    </Link>
   ) : (
     img
   );
@@ -204,6 +229,16 @@ function VideoWidget({ widget }: { widget: Widget }) {
     <video controls className="w-full rounded">
       <source src={widget.rss_url ?? ""} />
     </video>
+  );
+}
+
+function BlockWidget({ widget }: { widget: Widget }) {
+  if (!widget?.raw?.content) return null;
+  return (
+    <div
+      className="prose prose-sm max-w-none text-gray-700"
+      dangerouslySetInnerHTML={{ __html: widget.raw.content }}
+    />
   );
 }
 
@@ -238,13 +273,16 @@ function WPWidget({ widget }: { widget: Widget }) {
 
     // Type-specific fallbacks
     switch (widget.type) {
-      case "image":
+      case "media_image":
         return <ImageWidget widget={widget} />;
       case "video":
       case "audio":
         return <VideoWidget widget={widget} />;
       case "rss":
         return <RssFeed widget={widget} />;
+      case "block":
+        return <BlockWidget widget={widget} />;
+
       case "search":
         return (
           <form action="/search" className="flex gap-2">
@@ -291,16 +329,27 @@ export default function WPWidgetArea({ sidebar, widgets }: WPWidgetAreaProps) {
   const isFooter = sidebar === "footer";
 
   return (
-    <div
-      className={
-        isFooter
-          ? "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
-          : "flex flex-col gap-6"
-      }
-    >
-      {widgets.map((widget) => (
-        <WPWidget key={widget.id} widget={widget} />
-      ))}
+    <div className="flex w-full bg-gray-100 p-4">
+      <div
+        className={
+          isFooter
+            ? "mx-auto flex w-full flex-wrap p-4 md:max-w-275"
+            : "flex w-full"
+        }
+      >
+        <div
+          id={`${sidebar}_sidebar`}
+          className={
+            isFooter
+              ? "grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              : "flex w-full flex-col gap-4"
+          }
+        >
+          {widgets.map((widget) => (
+            <WPWidget key={widget.id} widget={widget} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

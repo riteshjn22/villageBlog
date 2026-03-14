@@ -1,10 +1,9 @@
-"use client";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Script from "next/script";
-import { SessionProvider } from "next-auth/react";
+import Providers from "@/components/Providers";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
@@ -48,11 +47,11 @@ export default function RootLayout({
           />
         </noscript>
 
-        <SessionProvider refetchInterval={60} refetchOnWindowFocus>
+        <Providers>
           <Header />
           {children}
           <Footer />
-        </SessionProvider>
+        </Providers>
 
         <Script
           src="https://cdn.lordicon.com/lordicon.js"

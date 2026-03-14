@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
       `${HOST}/districts-sitemap.xml`,
       `${HOST}/tehsils-sitemap.xml`,
       `${HOST}/villages-sitemap.xml`,
+      `${HOST}/blog/sitemap.xml`,
     ],
   };
 }
