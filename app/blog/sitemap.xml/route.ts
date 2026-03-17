@@ -122,12 +122,6 @@ export async function GET() {
   ${pageUrls}
 
   <!-- Categories -->
-
-
-
-
-
-
   ${categoryUrls}
 
   <!-- Posts -->
