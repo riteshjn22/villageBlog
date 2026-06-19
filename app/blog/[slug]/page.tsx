@@ -10,6 +10,17 @@ import {
 import { formatDate } from "@/utils/common";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { cache } from "react";  // ✅ add this
+
+// ✅ Add revalidate
+export const revalidate = 3600;  // refresh every 1 hour
+
+// ✅ Cache fetchers to avoid double API calls
+const getCachedPost = cache(async (slug: string) => {
+  const post = await getPostBySlug(slug);
+  if (post) return post;
+  return await getPageBySlug(slug);
+});
 
 export async function generateMetadata({
   params,
@@ -17,16 +28,21 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const content = (await getPostBySlug(slug)) || (await getPageBySlug(slug));
+
+  // ✅ Uses cache — no duplicate API call
+  const content = await getCachedPost(slug);
 
   if (!content) return {};
 
   const tags =
-    content._embedded?.["wp:term"]?.[1]?.map((t: { name: string }) => t.name) ??
-    [];
+    content._embedded?.["wp:term"]?.[1]?.map(
+      (t: { name: string }) => t.name
+    ) ?? [];
+
   const categories =
-    content._embedded?.["wp:term"]?.[0]?.map((c: { name: string }) => c.name) ??
-    [];
+    content._embedded?.["wp:term"]?.[0]?.map(
+      (c: { name: string }) => c.name
+    ) ?? [];
 
   const keywords = [
     ...categories,
@@ -38,7 +54,9 @@ export async function generateMetadata({
   ];
 
   const title = content.title.rendered;
-  const description = content.excerpt.rendered.replace(/<[^>]*>/g, "").trim();
+  const description = content.excerpt.rendered
+    .replace(/<[^>]*>/g, "")
+    .trim();
   const image = content.fimg_url || `${HOST}/images/default-share.jpg`;
 
   return {
@@ -60,19 +78,29 @@ export async function generateMetadata({
       description,
       images: [image],
     },
-    alternates: { canonical: `https://village.trendswe.com/blog/${slug}` },
+    alternates: {
+      canonical: `https://village.trendswe.com/blog/${slug}`,
+    },
   };
 }
 
-// Pre-render both posts and pages at build time
+// ✅ Pre-render ALL posts not just 100
 export async function generateStaticParams() {
-  const [{ posts }, pages] = await Promise.all([
-    getAllPosts(1, 100),
-    getAllPages(),
-  ]);
-  return [...(posts ?? []), ...(pages ?? [])].map((item) => ({
-    slug: item.slug,
-  }));
+  try {
+    const [{ posts }, pages] = await Promise.all([
+      getAllPosts(1, 1000),   // ← increased from 100 to 1000
+      getAllPages(),
+    ]);
+    return [
+      ...(Array.isArray(posts) ? posts : []),
+      ...(Array.isArray(pages) ? pages : []),
+    ].map((item) => ({
+      slug: item.slug,
+    }));
+  } catch (error) {
+    console.error("generateStaticParams error:", error);
+    return [];
+  }
 }
 
 export default async function SingleBlog({
@@ -82,10 +110,8 @@ export default async function SingleBlog({
 }) {
   const { slug } = await params;
 
-  const post = await getPostBySlug(slug);
-  const page = post ? null : await getPageBySlug(slug);
-  const content = post || page;
-
+  // ✅ Uses cache — no duplicate API call
+  const content = await getCachedPost(slug);
   const rightWidgets = await getRightSidebarWidgets();
 
   if (!content) notFound();
@@ -122,7 +148,9 @@ export default async function SingleBlog({
             )}
           </p>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: content.content.rendered }} />
+        <div
+          dangerouslySetInnerHTML={{ __html: content.content.rendered }}
+        />
       </div>
       <div className="sticky top-18 flex w-full self-start md:w-1/3">
         <WPWidgetArea sidebar="right" widgets={rightWidgets} />
