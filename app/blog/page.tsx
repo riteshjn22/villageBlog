@@ -8,6 +8,9 @@ import {
 import Pagination from "@/pagination";
 import { HOST } from "@/lib/constants/constants";
 
+// ✅ Add revalidate
+export const revalidate = 3600;   // refresh every 1 hour
+
 interface WPPost {
   id: number;
   slug: string;
@@ -51,7 +54,6 @@ export default async function Blog({
 }) {
   const frontPage = await getBlogFrontPage();
 
-  // If WP has a Posts page set under Settings → Reading, render its content
   if (frontPage) {
     return (
       <main className="mx-auto flex w-full flex-col gap-6 p-4 md:max-w-275">
@@ -71,7 +73,6 @@ export default async function Blog({
     );
   }
 
-  // Otherwise fall back to paginated posts list
   const { page } = await searchParams;
   const currentPage = parseInt(page || "1");
   const { posts, totalPages } = await getAllPosts(currentPage);
@@ -79,7 +80,9 @@ export default async function Blog({
   return (
     <main className="mx-auto flex w-full flex-col gap-6 p-4 md:max-w-275">
       <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-        {posts?.map((item: WPPost) => {
+
+        {/* ✅ Array.isArray check added */}
+        {(Array.isArray(posts) ? posts : []).map((item: WPPost) => {
           const itemBlogData = {
             url: `/blog/${item?.slug}`,
             imageUrl: item?._embedded?.["wp:featuredmedia"]?.[0]?.source_url,
@@ -92,6 +95,7 @@ export default async function Blog({
           };
           return <BlogBody item={itemBlogData} key={item?.id} />;
         })}
+
       </div>
       <Pagination currentPage={currentPage} totalPages={totalPages} />
     </main>
