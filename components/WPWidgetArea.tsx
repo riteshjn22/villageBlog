@@ -11,7 +11,9 @@ function toLocalUrl(url: string | undefined): string {
       ? new URL(process.env.NEXT_PUBLIC_WP_URL).origin
       : null;
     if (wpOrigin && parsed.origin === wpOrigin) {
-      return `${HOST}/blog${parsed.pathname}${parsed.search}${parsed.hash}`;
+      // return `${HOST}/blog${parsed.pathname}${parsed.search}${parsed.hash}`;
+      const pathname = parsed.pathname.replace(/^\/blog/, '');
+return `${HOST}/blog${pathname}${parsed.search}${parsed.hash}`;
     }
   } catch {
     // relative URL or invalid — return as-is
