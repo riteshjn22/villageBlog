@@ -5,6 +5,8 @@ import { HOST } from "@/lib/constants/constants";
 
 function toLocalUrl(url: string | undefined): string {
   if (!url) return "";
+  // ✅ Fix double /blog directly
+  url = url.replace('/blog/blog/', '/blog/')
   try {
     const parsed = new URL(url);
     const wpOrigin = process.env.NEXT_PUBLIC_WP_URL
